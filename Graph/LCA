@@ -1,0 +1,57 @@
+// Tìm tổ tiên chung gần nhất của hai đỉnh u và v trên đồ thị dạng cây
+
+const int MAXN = 1e5 + 5;
+ 
+int n, q, timeDfs = 0;
+int depth[MAXN], sz[MAXN];
+int anc[MAXN][15], timeIn[MAXN], timeOut[MAXN];
+vector<int> g[MAXN];
+ 
+void DFS(int u, int par){
+    timeIn[u] = ++timeDfs;
+    sz[u] = 1;
+    for(int v: g[u]){
+        if(par == v) continue;
+        anc[v][0] = u;
+        depth[v] = depth[u] + 1;
+        DFS(v, u);
+        sz[u] += sz[v];
+    }
+    timeOut[u] = timeDfs;
+}
+ 
+bool check(int u, int v){
+    return (timeIn[u] <= timeIn[v] && timeOut[v] <= timeOut[u]);
+}
+ 
+int findGo(int u, int v){
+    foru(i,14,0){
+        if(!check(anc[u][i], v)){
+            u = anc[u][i];
+        }
+    }
+    return u;
+}
+ 
+int LCA(int u, int v){
+    if(check(u, v)){
+        return u;
+    }
+    if(check(v, u)){
+        return v;
+    }
+    return anc[findGo(u, v)][0];
+}
+ 
+int calc(int u, int v){
+    return depth[u] + depth[v] - 2 * depth[LCA(u, v)];
+}
+
+DFS(1, 0);
+timeIn[0] = 0;
+timeOut[0] = 1e9;
+ford(j,1,14){
+    ford(i,1,n){
+            anc[i][j] = anc[anc[i][j - 1]][j - 1];
+    }
+}
